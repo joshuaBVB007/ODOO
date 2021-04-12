@@ -1,0 +1,21 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+Vagrant.configure("2") do |config|
+  config.vm.box ="bento/ubuntu-20.04"
+  config.vm.network "forwarded_port",guest:8069,host:8069,host_ip:"127.0.0.1"
+  config.vm.provision "shell", inline: <<-SHELL
+  apt-get update
+  apt-get -y upgrade
+  ssh vagrant@vagrant -p 8069
+  apt install postgresql -y
+  wget -O - https://nightly.odoo.com/odoo.key | apt-key add -
+  echo "deb http://nightly.odoo.com/14.0/nightly/deb/ ./" >
+  /etc/apt/sources.list.d/odoo.list
+  apt-get update && apt-get install -y odoo
+  SHELL
+end
